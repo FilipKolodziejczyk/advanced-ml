@@ -1,4 +1,5 @@
 /course-content/
+*.arff
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,python,jupyternotebooks,windows,linux,visualstudiocode,pycharm
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,python,jupyternotebooks,windows,linux,visualstudiocode,pycharm
