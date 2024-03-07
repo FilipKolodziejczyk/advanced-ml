@@ -16,10 +16,15 @@ import torch.optim as optim
 
 # Custom Optimizer Experiment Function
 def run_custom_optimizer_experiment(
-    optimizer_class, X_train, y_train, X_test, y_test, tolerance, max_epochs, **kwargs
+    optimizer,
+    X_train,
+    y_train,
+    X_test,
+    y_test,
+    tolerance,
+    max_epochs,
 ):
     log_reg = LogisticRegression()
-    optimizer = optimizer_class(**kwargs)
     weight_changes = log_reg.fit(X_train, y_train, optimizer, max_epochs, tolerance)
     predictions = log_reg.predict(X_test)
     balanced_acc = balanced_accuracy_score(y_test, predictions)
@@ -80,7 +85,7 @@ max_epochs = 500
 tolerance = 1e-4
 test_size = 0.3
 n_samples = 1000
-n_features = 7
+n_features = 70
 standarize = True
 
 
@@ -95,6 +100,9 @@ if standarize:
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
 
+# Initialize optimizers (with possible hyperparameters adjustments)
+sgd = SGD(batch_size=16)
+
 # Run experiments
 # custom_adam_acc, adam_weight_changes = run_custom_optimizer_experiment(
 #     ADAM, X_train, y_train, X_test, y_test, tolerance, max_epochs, learning_rate=1
@@ -103,7 +111,7 @@ if standarize:
 #     IWLS, X_train, y_train, X_test, y_test, tolerance, max_epochs
 # )
 custom_sgd_acc, sgd_weight_changes = run_custom_optimizer_experiment(
-    SGD, X_train, y_train, X_test, y_test, tolerance, max_epochs
+    sgd, X_train, y_train, X_test, y_test, tolerance, max_epochs
 )
 
 pytorch_adam_acc, pytorch_adam_losses = run_pytorch_experiment(
