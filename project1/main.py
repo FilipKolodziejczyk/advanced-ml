@@ -103,15 +103,16 @@ if standarize:
 
 # Initialize optimizers (with possible hyperparameters adjustments)
 adam = ADAM(batch_size=batch_size)
+iwsl = IWLS()
 sgd = SGD(batch_size=batch_size)
 
 # Run experiments
 custom_adam_acc, adam_weight_changes = run_custom_optimizer_experiment(
     adam, X_train, y_train, X_test, y_test, tolerance, max_epochs
 )
-# custom_iwls_acc, iwls_weight_changes = run_custom_optimizer_experiment(
-#     IWLS, X_train, y_train, X_test, y_test, tolerance, max_epochs
-# )
+custom_iwls_acc, iwls_weight_changes = run_custom_optimizer_experiment(
+    iwsl, X_train, y_train, X_test, y_test, tolerance, max_epochs
+)
 custom_sgd_acc, sgd_weight_changes = run_custom_optimizer_experiment(
     sgd, X_train, y_train, X_test, y_test, tolerance, max_epochs
 )
@@ -125,7 +126,7 @@ pytorch_sgd_acc, pytorch_sgd_losses = run_pytorch_experiment(
 
 # Print balanced accuracies
 print(f"Custom ADAM Accuracy: {custom_adam_acc}")
-# print(f"Custom IWLS Accuracy: {custom_iwls_acc}")
+print(f"Custom IWLS Accuracy: {custom_iwls_acc}")
 print(f"Custom SGD Accuracy: {custom_sgd_acc}")
 print(f"PyTorch ADAM Accuracy: {pytorch_adam_acc}")
 print(f"PyTorch SGD Accuracy: {pytorch_sgd_acc}")
@@ -134,7 +135,7 @@ print(f"PyTorch SGD Accuracy: {pytorch_sgd_acc}")
 plt.figure(figsize=(12, 6))
 
 plt.plot(adam_weight_changes, label="Custom ADAM")
-# plt.plot(iwls_weight_changes, label="Custom IWLS")
+plt.plot(iwls_weight_changes, label="Custom IWLS")
 plt.plot(sgd_weight_changes, label="Custom SGD")
 plt.plot(pytorch_adam_losses, label="PyTorch ADAM")
 plt.plot(pytorch_sgd_losses, label="PyTorch SGD")

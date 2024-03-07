@@ -5,11 +5,20 @@ from optimizer import Optimizer
 class IWLS(Optimizer):
     """Iteratively reweighted least squares optimizer"""
 
-    def update(self, X, y, weights, predictions):
-        # Diagonal matrix of weights
-        W = np.diag(predictions * (1 - predictions))
-        Z = X @ weights + np.linalg.pinv(W) @ (y - predictions)
+    def __init__(self, regularization: float = 0.001):
+        super().__init__(regularization=regularization)
 
-        # Solving the weighted least squares problem
-        new_weights = np.linalg.lstsq(X.T @ W @ X, X.T @ W @ Z, rcond=None)[0]
-        return new_weights.ravel()
+    def hessian(self, X, y_pred, params):
+        """Calculate the Hessian of the loss function with respect to the model's parameters"""
+        # Check for bias and adjust if necessary
+        if X.shape[1] != params.shape[0]:
+            X = np.hstack((X, np.ones((X.shape[0], 1))))
+
+        W = np.diag(y_pred * (1 - y_pred))
+        return X.T @ W @ X / X.shape[0] + self.regularization * np.eye(params.shape[0])
+
+    def update(self, X, y, y_pred, params):
+        grad = self.gradient(X, y, y_pred, params)
+        hessian = self.hessian(X, y_pred, params)
+        params -= np.linalg.inv(hessian) @ grad
+        return params
