@@ -86,6 +86,7 @@ tolerance = 1e-4
 test_size = 0.3
 n_samples = 1000
 n_features = 70
+batch_size = 16
 standarize = True
 
 
@@ -101,12 +102,13 @@ if standarize:
     X_test = scaler.transform(X_test)
 
 # Initialize optimizers (with possible hyperparameters adjustments)
-sgd = SGD(batch_size=16)
+adam = ADAM(batch_size=batch_size)
+sgd = SGD(batch_size=batch_size)
 
 # Run experiments
-# custom_adam_acc, adam_weight_changes = run_custom_optimizer_experiment(
-#     ADAM, X_train, y_train, X_test, y_test, tolerance, max_epochs, learning_rate=1
-# )
+custom_adam_acc, adam_weight_changes = run_custom_optimizer_experiment(
+    adam, X_train, y_train, X_test, y_test, tolerance, max_epochs
+)
 # custom_iwls_acc, iwls_weight_changes = run_custom_optimizer_experiment(
 #     IWLS, X_train, y_train, X_test, y_test, tolerance, max_epochs
 # )
@@ -122,7 +124,7 @@ pytorch_sgd_acc, pytorch_sgd_losses = run_pytorch_experiment(
 )
 
 # Print balanced accuracies
-# print(f"Custom ADAM Accuracy: {custom_adam_acc}")
+print(f"Custom ADAM Accuracy: {custom_adam_acc}")
 # print(f"Custom IWLS Accuracy: {custom_iwls_acc}")
 print(f"Custom SGD Accuracy: {custom_sgd_acc}")
 print(f"PyTorch ADAM Accuracy: {pytorch_adam_acc}")
@@ -131,7 +133,7 @@ print(f"PyTorch SGD Accuracy: {pytorch_sgd_acc}")
 # Plot convergence
 plt.figure(figsize=(12, 6))
 
-# plt.plot(adam_weight_changes, label="Custom ADAM")
+plt.plot(adam_weight_changes, label="Custom ADAM")
 # plt.plot(iwls_weight_changes, label="Custom IWLS")
 plt.plot(sgd_weight_changes, label="Custom SGD")
 plt.plot(pytorch_adam_losses, label="PyTorch ADAM")
