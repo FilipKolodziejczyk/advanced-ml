@@ -19,11 +19,15 @@ class LogisticRegression:
         return (self.predict_proba(X) >= 0.5).astype(int)
 
     def fit(
-        self, X, y, optimizer: Optimizer, max_epochs: int = 500, tolerance: float = 0.001
+        self,
+        X,
+        y,
+        optimizer: Optimizer,
+        max_epochs: int = 500,
+        tolerance: float = 0.001,
     ):
         self.weights = np.zeros(X.shape[1])
         weights_changes = []
-
 
         for _ in range(max_epochs):
             old_weights = np.copy(self.weights)

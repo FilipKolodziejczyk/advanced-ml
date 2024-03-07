@@ -13,8 +13,11 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+
 # Custom Optimizer Experiment Function
-def run_custom_optimizer_experiment(optimizer_class, X_train, y_train, X_test, y_test, tolerance, max_epochs):
+def run_custom_optimizer_experiment(
+    optimizer_class, X_train, y_train, X_test, y_test, tolerance, max_epochs
+):
     log_reg = LogisticRegression()
     optimizer = optimizer_class()
     weight_changes = log_reg.fit(X_train, y_train, optimizer, max_epochs, tolerance)
@@ -22,8 +25,11 @@ def run_custom_optimizer_experiment(optimizer_class, X_train, y_train, X_test, y
     balanced_acc = balanced_accuracy_score(y_test, predictions)
     return balanced_acc, weight_changes
 
+
 # PyTorch Experiment Function
-def run_pytorch_experiment(X_train, y_train, X_test, y_test, optimizer_name, tolerance, max_epochs):
+def run_pytorch_experiment(
+    X_train, y_train, X_test, y_test, optimizer_name, tolerance, max_epochs
+):
     # Convert data to torch tensors
     X_train_torch = torch.tensor(X_train, dtype=torch.float32)
     y_train_torch = torch.tensor(y_train, dtype=torch.float32).squeeze()
@@ -34,9 +40,9 @@ def run_pytorch_experiment(X_train, y_train, X_test, y_test, optimizer_name, tol
     criterion = nn.BCELoss()
 
     # Choose optimizer
-    if optimizer_name.lower() == 'adam':
+    if optimizer_name.lower() == "adam":
         optimizer = optim.Adam(model.parameters(), lr=0.001)
-    elif optimizer_name.lower() == 'sgd':
+    elif optimizer_name.lower() == "sgd":
         optimizer = optim.SGD(model.parameters(), lr=0.01)
     else:
         raise ValueError("Unsupported optimizer. Choose 'adam' or 'sgd'.")
@@ -68,6 +74,7 @@ def run_pytorch_experiment(X_train, y_train, X_test, y_test, optimizer_name, tol
 
     return balanced_acc, losses
 
+
 # Simulation parameters
 max_epochs = 500
 tolerance = 1e-6
@@ -83,12 +90,22 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 # Run experiments
-custom_adam_acc, adam_weight_changes = run_custom_optimizer_experiment(ADAM, X_train_scaled, y_train, X_test_scaled, y_test, tolerance, max_epochs)
-custom_iwls_acc, iwls_weight_changes = run_custom_optimizer_experiment(IWLS, X_train_scaled, y_train, X_test_scaled, y_test, tolerance, max_epochs)
-custom_sgd_acc, sgd_weight_changes = run_custom_optimizer_experiment(SGD, X_train_scaled, y_train, X_test_scaled, y_test, tolerance, max_epochs)
+custom_adam_acc, adam_weight_changes = run_custom_optimizer_experiment(
+    ADAM, X_train_scaled, y_train, X_test_scaled, y_test, tolerance, max_epochs
+)
+custom_iwls_acc, iwls_weight_changes = run_custom_optimizer_experiment(
+    IWLS, X_train_scaled, y_train, X_test_scaled, y_test, tolerance, max_epochs
+)
+custom_sgd_acc, sgd_weight_changes = run_custom_optimizer_experiment(
+    SGD, X_train_scaled, y_train, X_test_scaled, y_test, tolerance, max_epochs
+)
 
-pytorch_adam_acc, pytorch_adam_losses = run_pytorch_experiment(X_train_scaled, y_train, X_test_scaled, y_test, 'adam', tolerance, max_epochs)
-pytorch_sgd_acc, pytorch_sgd_losses = run_pytorch_experiment(X_train_scaled, y_train, X_test_scaled, y_test, 'sgd', tolerance, max_epochs)
+pytorch_adam_acc, pytorch_adam_losses = run_pytorch_experiment(
+    X_train_scaled, y_train, X_test_scaled, y_test, "adam", tolerance, max_epochs
+)
+pytorch_sgd_acc, pytorch_sgd_losses = run_pytorch_experiment(
+    X_train_scaled, y_train, X_test_scaled, y_test, "sgd", tolerance, max_epochs
+)
 
 # Print balanced accuracies
 print(f"Custom ADAM Accuracy: {custom_adam_acc}")
@@ -100,14 +117,14 @@ print(f"PyTorch SGD Accuracy: {pytorch_sgd_acc}")
 # Plot convergence
 plt.figure(figsize=(12, 6))
 
-plt.plot(adam_weight_changes, label='Custom ADAM')
-plt.plot(iwls_weight_changes, label='Custom IWLS')
-plt.plot(sgd_weight_changes, label='Custom SGD')
-plt.plot(pytorch_adam_losses, label='PyTorch ADAM')
-plt.plot(pytorch_sgd_losses, label='PyTorch SGD')
+plt.plot(adam_weight_changes, label="Custom ADAM")
+plt.plot(iwls_weight_changes, label="Custom IWLS")
+plt.plot(sgd_weight_changes, label="Custom SGD")
+plt.plot(pytorch_adam_losses, label="PyTorch ADAM")
+plt.plot(pytorch_sgd_losses, label="PyTorch SGD")
 
-plt.xlabel('Epoch')
-plt.ylabel('Weight Change / Loss')
-plt.title('Optimizer Convergence Comparison')
+plt.xlabel("Epoch")
+plt.ylabel("Weight Change / Loss")
+plt.title("Optimizer Convergence Comparison")
 plt.legend()
 plt.show()
