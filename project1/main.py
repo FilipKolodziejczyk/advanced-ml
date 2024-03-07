@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from logistic_regression import LogisticRegression
+from interactions import generate_interactions
 from adam import ADAM
 from iwls import IWLS
 from sgd import SGD
@@ -73,7 +74,8 @@ tolerance = 1e-6
 
 
 # Prepare the dataset
-X, y = make_classification(n_samples=1000, n_features=20, n_classes=2)
+X, y = make_classification(n_samples=1000, n_features=7, n_classes=2)
+X = generate_interactions(X)
 y = y.reshape(-1, 1).ravel()
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 scaler = StandardScaler()
