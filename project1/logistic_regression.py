@@ -5,15 +5,21 @@ from optimizer import Optimizer
 class LogisticRegression:
     def __init__(self):
         self.weights = None
+        self.bias = 0
 
     @staticmethod
     def sigmoid(z):
         return 1 / (1 + np.exp(-z))
 
     def predict_proba(self, X):
-        z = X @ self.weights
-        z = np.clip(z, -100, 100)  # Clipping to prevent numerical underflow
+        z = X @ self.weights + self.bias
+        z = np.clip(z, -100, 100)  # Preventing overflow
         return self.sigmoid(z)
+
+    @staticmethod
+    def binary_cross_entropy(y, y_pred):
+        y_pred = np.clip(y_pred, 1e-15, 1 - 1e-15)  # Preventing log(0) and log(1)
+        return -np.mean(y * np.log(y_pred) + (1 - y) * np.log(1 - y_pred))
 
     def predict(self, X):
         return (self.predict_proba(X) >= 0.5).astype(int)
@@ -26,18 +32,18 @@ class LogisticRegression:
         max_epochs: int = 500,
         tolerance: float = 0.001,
     ):
-        self.weights = np.zeros(X.shape[1])
-        weights_changes = []
+        self.weights = np.random.normal(0, 0.01, X.shape[1])
+        loss_history = [-np.inf]
 
         for _ in range(max_epochs):
-            old_weights = np.copy(self.weights)
-            new_weights = optimizer.update(X, y, self.weights, self.predict_proba(X))
-            weights_change = np.linalg.norm(new_weights - old_weights)
-            weights_changes.append(weights_change)  # Record the change
+            params = np.concatenate((self.weights, [self.bias]))
+            new_params = optimizer.update(X, y, self.predict_proba(X), params)
 
-            self.weights = new_weights
+            self.weights = new_params[:-1]
+            self.bias = new_params[-1]
+            loss_history.append(self.binary_cross_entropy(y, self.predict_proba(X)))
 
-            if weights_change < tolerance:
+            if abs(loss_history[-1] - loss_history[-2]) <= tolerance:
                 break
 
-        return weights_changes
+        return loss_history[1:]

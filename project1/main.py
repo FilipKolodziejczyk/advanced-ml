@@ -16,10 +16,15 @@ import torch.optim as optim
 
 # Custom Optimizer Experiment Function
 def run_custom_optimizer_experiment(
-    optimizer_class, X_train, y_train, X_test, y_test, tolerance, max_epochs
+    optimizer,
+    X_train,
+    y_train,
+    X_test,
+    y_test,
+    tolerance,
+    max_epochs,
 ):
     log_reg = LogisticRegression()
-    optimizer = optimizer_class()
     weight_changes = log_reg.fit(X_train, y_train, optimizer, max_epochs, tolerance)
     predictions = log_reg.predict(X_test)
     balanced_acc = balanced_accuracy_score(y_test, predictions)
@@ -77,34 +82,46 @@ def run_pytorch_experiment(
 
 # Simulation parameters
 max_epochs = 500
-tolerance = 1e-6
+tolerance = 1e-4
+test_size = 0.3
+n_samples = 1000
+n_features = 70
+batch_size = 16
+standarize = True
 
 
 # Prepare the dataset
-X, y = make_classification(n_samples=1000, n_features=7, n_classes=2)
+X, y = make_classification(n_classes=2, n_samples=n_samples, n_features=n_features)
 X = generate_interactions(X)
 y = y.reshape(-1, 1).ravel()
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
+
+if standarize:
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+
+# Initialize optimizers (with possible hyperparameters adjustments)
+adam = ADAM(batch_size=batch_size)
+iwsl = IWLS()
+sgd = SGD(batch_size=batch_size)
 
 # Run experiments
 custom_adam_acc, adam_weight_changes = run_custom_optimizer_experiment(
-    ADAM, X_train_scaled, y_train, X_test_scaled, y_test, tolerance, max_epochs
+    adam, X_train, y_train, X_test, y_test, tolerance, max_epochs
 )
 custom_iwls_acc, iwls_weight_changes = run_custom_optimizer_experiment(
-    IWLS, X_train_scaled, y_train, X_test_scaled, y_test, tolerance, max_epochs
+    iwsl, X_train, y_train, X_test, y_test, tolerance, max_epochs
 )
 custom_sgd_acc, sgd_weight_changes = run_custom_optimizer_experiment(
-    SGD, X_train_scaled, y_train, X_test_scaled, y_test, tolerance, max_epochs
+    sgd, X_train, y_train, X_test, y_test, tolerance, max_epochs
 )
 
 pytorch_adam_acc, pytorch_adam_losses = run_pytorch_experiment(
-    X_train_scaled, y_train, X_test_scaled, y_test, "adam", tolerance, max_epochs
+    X_train, y_train, X_test, y_test, "adam", tolerance, max_epochs
 )
 pytorch_sgd_acc, pytorch_sgd_losses = run_pytorch_experiment(
-    X_train_scaled, y_train, X_test_scaled, y_test, "sgd", tolerance, max_epochs
+    X_train, y_train, X_test, y_test, "sgd", tolerance, max_epochs
 )
 
 # Print balanced accuracies
@@ -125,6 +142,7 @@ plt.plot(pytorch_sgd_losses, label="PyTorch SGD")
 
 plt.xlabel("Epoch")
 plt.ylabel("Weight Change / Loss")
+plt.ylim(0, 1)
 plt.title("Optimizer Convergence Comparison")
 plt.legend()
 plt.show()
