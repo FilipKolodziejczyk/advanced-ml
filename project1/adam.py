@@ -7,7 +7,7 @@ class ADAM(Optimizer):
 
     def __init__(
         self,
-        learning_rate: float = 0.01,
+        learning_rate: float = 0.001,
         beta1: float = 0.9,
         beta2: float = 0.999,
         epsilon: float = 1e-8,
