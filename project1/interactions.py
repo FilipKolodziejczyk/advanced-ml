@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def generate_interactions(X):
     num_samples, num_features = X.shape
 
@@ -13,7 +14,8 @@ def generate_interactions(X):
 
     return np.concatenate((X, interaction_data), axis=1)
 
-def test():        
+
+def test():
     a = 2
     b = 4
 
