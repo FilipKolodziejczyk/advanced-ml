@@ -13,11 +13,12 @@ class LogisticRegression:
 
     def predict_proba(self, X):
         z = X @ self.weights + self.bias
+        z = np.clip(z, -100, 100)  # Preventing overflow
         return self.sigmoid(z)
 
     @staticmethod
     def binary_cross_entropy(y, y_pred):
-        # y_pred += 1e-50  # Preventing log(0) situations
+        y_pred = np.clip(y_pred, 1e-15, 1 - 1e-15)  # Preventing log(0) and log(1)
         return -np.mean(y * np.log(y_pred) + (1 - y) * np.log(1 - y_pred))
 
     def predict(self, X):
