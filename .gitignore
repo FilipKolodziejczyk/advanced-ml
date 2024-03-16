@@ -1,3 +1,5 @@
 /course-content/
 .DS_Store
 __pycache__/
+project1/datasets/*.csv
+project1/outputs/*.pdf

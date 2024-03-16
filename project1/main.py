@@ -92,7 +92,7 @@ standarize = True
 
 # Prepare the dataset
 X, y = make_classification(n_classes=2, n_samples=n_samples, n_features=n_features)
-X = generate_interactions(X)
+# X = generate_interactions(X)
 y = y.reshape(-1, 1).ravel()
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
 
