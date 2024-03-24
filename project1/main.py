@@ -14,6 +14,19 @@ import torch.nn as nn
 import torch.optim as optim
 
 
+def run_classifier_experiment(
+    classifier,
+    X_train,
+    y_train,
+    X_test,
+    y_test
+):
+    classifier.fit(X_train, y_train)
+    predictions = classifier.predict(X_test)
+    balanced_acc = balanced_accuracy_score(y_test, predictions)
+    return balanced_acc
+
+
 # Custom Optimizer Experiment Function
 def run_custom_optimizer_experiment(
     optimizer,
@@ -22,8 +35,9 @@ def run_custom_optimizer_experiment(
     X_test,
     y_test,
     tolerance,
-    max_epochs,
+    max_epochs
 ):
+
     log_reg = LogisticRegression()
     weight_changes = log_reg.fit(X_train, y_train, optimizer, max_epochs, tolerance)
     predictions = log_reg.predict(X_test)
